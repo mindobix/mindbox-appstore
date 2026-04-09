@@ -18,12 +18,6 @@ A zero-backend JSON configuration manager for development teams. Create, edit, v
 
 ---
 
-### [FileSync](https://github.com/mindobix/local-filesync)
-
-Cross-platform LAN file sync Electron app — peer discovery via UDP, file transfer via WebSocket, system tray, and React UI. Sync files across devices on your local network with no cloud required.
-
----
-
 ## Web Apps
 
 ### [VibeCoding App Ideas](https://github.com/mindobix/local-vibecoding-appideas)
@@ -65,6 +59,18 @@ Track daily habits on a visual monthly calendar. Create habits with custom names
 ### [Weekly Options Trade Plan](https://github.com/mindobix/local-weekly-options-trade-plan)
 
 Plan and track weekly options trades across monthly, weekly, and daily views. Log calls and puts with strike, expiry, trigger price, targets, and stop — with status workflow and filter/search.
+
+---
+
+### [FileSync](https://github.com/mindobix/local-filesync)
+
+Cross-platform LAN file sync Electron app — peer discovery via UDP, file transfer via WebSocket, system tray, and React UI. Sync files across devices on your local network with no cloud required.
+
+---
+
+### [Keywords Files Finder](https://github.com/mindobix/local-keywords-files-finder)
+
+Search your local files by keyword — scan folders, filter by file type, and locate matches fast with no server required. All processing happens in the browser.
 
 ---
 
