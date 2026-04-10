@@ -12,18 +12,21 @@ A full-featured, privacy-first trading journal that runs entirely in your browse
 
 ---
 
+### [LocalApiWebProxy](https://github.com/mindobix/local-api-web-proxy)
+
+A zero-config HTTP/HTTPS proxy with a real-time dashboard. Inspect, debug, and export API traffic from any device on your network — like Charles Proxy, but open-source and a single `npm start`.
+
+---
+
 ### [ShareAnyJSON](https://github.com/mindobix/local-shareanyjson)
 
 A zero-backend JSON configuration manager for development teams. Create, edit, version, template, and promote JSON config files across environments — file explorer, UI form view, version history, and backup/restore, all in the browser.
 
 ---
 
-## Web Apps
-
 ### [VibeCoding App Ideas](https://github.com/mindobix/local-vibecoding-appideas)
 
-Your private idea workspace for vibe coders. Capture, write, and track every app idea in a Notion-style editor — rich text formatting, block types (H1–H3, lists, quotes, code), text & background colors, floating selection toolbar, drag ideas between categories, GitHub repo links, status workflow (Idea → In Progress → Shipped → Archived), named version snapshots, and full backup/restore. Zero cloud. Zero accounts. One HTML file.
----
+## Your private idea workspace for vibe coders. Capture, write, and track every app idea in a Notion-style editor — rich text formatting, block types (H1–H3, lists, quotes, code), text & background colors, floating selection toolbar, drag ideas between categories, GitHub repo links, status workflow (Idea → In Progress → Shipped → Archived), named version snapshots, and full backup/restore. Zero cloud. Zero accounts. One HTML file.
 
 ### [Desktops FileSync](https://github.com/mindobix/local-filesync)
 
@@ -34,7 +37,6 @@ Cross-platform LAN file sync Electron app — peer discovery via UDP, file trans
 ### [Keywords Files Finder](https://github.com/mindobix/local-keywords-files-finder)
 
 Search your local files by keyword — scan folders, filter by file type, and locate matches fast with no server required. All processing happens in the browser.
-
 
 ---
 
