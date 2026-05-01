@@ -1,4 +1,8 @@
 import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron'
+
+declare module 'electron' {
+  interface App { isQuitting: boolean }
+}
 import path from 'path'
 import fs from 'fs'
 import { execSync } from 'child_process'
@@ -85,11 +89,15 @@ function createWindow(): void {
 
   mainWindow.once('ready-to-show', () => mainWindow?.show())
 
-  // Closing the window quits the app on all platforms
-  mainWindow.on('closed', () => {
-    mainWindow = null
-    app.quit()
+  // On macOS, closing the window hides it — quit only via the tray menu
+  mainWindow.on('close', (e) => {
+    if (process.platform === 'darwin' && !app.isQuitting) {
+      e.preventDefault()
+      mainWindow?.hide()
+    }
   })
+
+  mainWindow.on('closed', () => { mainWindow = null })
 
   cleanup = setupIPC(mainWindow)
 }
@@ -104,7 +112,8 @@ function createTray(): void {
     { type: 'separator' },
     { label: 'Open', click: () => { mainWindow?.show(); mainWindow?.focus() } },
     { type: 'separator' },
-    { label: 'Quit', click: () => app.quit() }
+    { label: 'Quit', click: () => { app.isQuitting = true; app.quit() } },
+    { label: 'Force Quit', click: () => { app.isQuitting = true; app.exit(0) } }
   ])
 
   tray.setContextMenu(menu)
@@ -117,6 +126,7 @@ app.whenReady().then(() => {
   app.on('activate', () => { mainWindow?.show(); mainWindow?.focus() })
 })
 
-app.on('window-all-closed', () => app.quit())
+// On macOS, keep the process alive when all windows are closed (tray-only mode)
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
 
 app.on('before-quit', () => cleanup?.())
