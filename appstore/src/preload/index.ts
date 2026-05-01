@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('api', {
     return () => ipcRenderer.removeListener('server-stopped', handler)
   },
 
+  reloadApp: () => ipcRenderer.invoke('reload-app'),
   getFavorites: () => ipcRenderer.invoke('get-favorites'),
   saveFavorites: (ids: string[]) => ipcRenderer.invoke('save-favorites', ids),
 

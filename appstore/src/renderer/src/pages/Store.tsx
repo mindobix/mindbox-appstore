@@ -141,7 +141,7 @@ export default function Store({ settings, onChangeFolder }: Props) {
 
   const handleRestoreAppstore = async () => {
     const result = await window.api.restoreAppstore()
-    if (result.ok) { showToast('Restored — reloading…'); setTimeout(() => window.location.reload(), 1200) }
+    if (result.ok) { showToast('Restored — reloading…'); setTimeout(() => window.api.reloadApp(), 1200) }
     else if (result.error) showToast(`Restore failed: ${result.error}`)
   }
 

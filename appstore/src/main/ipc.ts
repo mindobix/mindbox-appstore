@@ -230,6 +230,10 @@ export function setupIPC(mainWindow: BrowserWindow): () => void {
   })
 
   // ── Backup handlers ──────────────────────────────────────────────────────
+  ipcMain.handle('reload-app', () => {
+    if (!mainWindow.isDestroyed()) mainWindow.reload()
+  })
+
   ipcMain.handle('get-favorites', () => db.getFavorites())
 
   ipcMain.handle('save-favorites', (_e, ids: string[]) => {
