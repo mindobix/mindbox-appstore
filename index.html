@@ -1,809 +1,941 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Local &rsaquo; LaunchPad</title>
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mindobix · App Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+    :root {
+      --bg:            #07080e;
+      --bg2:           #0b0d16;
+      --surface:       #0d0f1a;
+      --surface2:      #111420;
+      --surface3:      #161928;
+      --border:        rgba(255,255,255,0.06);
+      --border2:       rgba(255,255,255,0.1);
+      --border3:       rgba(255,255,255,0.16);
+      --text:          #eef0ff;
+      --text2:         #8890b8;
+      --muted:         #4a5080;
+      --dim:           #252840;
+      --accent:        #5b5ef4;
+      --accent-glow:   rgba(91,94,244,0.22);
+      --green:         #22c55e;
+      --green-bg:      rgba(34,197,94,0.12);
+      --green-border:  rgba(34,197,94,0.28);
+      --radius-card:   20px;
+      --radius-btn:    100px;
+      --radius-icon:   14px;
+      --topbar-h:      60px;
+      --filter-h:      48px;
+    }
 
-      :root {
-        --bg: #080c14;
-        --surface: #0f1520;
-        --surface2: #161e2e;
-        --border: #1e2d45;
-        --border2: #253550;
-        --text: #e8f0fe;
-        --muted: #6b7fa3;
-        --dim: #2a3a5c;
-        --accent: #6366f1;
-        --accent2: #818cf8;
-        --glow: rgba(99, 102, 241, 0.18);
-      }
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
 
-      html,
-      body {
-        min-height: 100vh;
-        background: var(--bg);
-        color: var(--text);
-        font-family:
-          "Inter",
-          -apple-system,
-          BlinkMacSystemFont,
-          sans-serif;
-        font-size: 14px;
-      }
+    /* ── TOPBAR ─────────────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--topbar-h);
+      background: rgba(7,8,14,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 28px;
+    }
 
-      /* ── NOISE OVERLAY ── */
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 0;
-      }
+    .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
-      /* ── AMBIENT GLOW ── */
-      body::after {
-        content: "";
-        position: fixed;
-        top: -200px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 900px;
-        height: 600px;
-        background: radial-gradient(
-          ellipse at center,
-          rgba(99, 102, 241, 0.12) 0%,
-          transparent 70%
-        );
-        pointer-events: none;
-        z-index: 0;
-      }
+    .brand-mark {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #5b5ef4, #8b5cf6);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 0 18px rgba(91,94,244,0.45);
+    }
 
-      .page {
-        position: relative;
-        z-index: 1;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 80px 24px 80px;
-      }
+    .brand-name {
+      font-size: 15px; font-weight: 800; letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
 
-      /* ── HEADER ── */
-      .hero {
-        text-align: center;
-        margin-bottom: 64px;
-      }
+    .search-wrap {
+      flex: 1; max-width: 340px; margin: 0 auto; position: relative;
+    }
+    .search-ico {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); color: var(--muted); font-size: 13px;
+      pointer-events: none;
+    }
+    #search {
+      width: 100%; height: 36px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius-btn);
+      padding: 0 14px 0 34px;
+      font: 500 13px/1 'Inter', sans-serif; color: var(--text);
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    #search::placeholder { color: var(--muted); }
+    #search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-      .hero-eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: rgba(99, 102, 241, 0.1);
-        border: 1px solid rgba(99, 102, 241, 0.25);
-        border-radius: 100px;
-        padding: 5px 14px;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--accent2);
-        margin-bottom: 24px;
-      }
+    .topbar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-      .hero-eyebrow-dot {
-        width: 6px;
-        height: 6px;
-        background: var(--accent);
-        border-radius: 50%;
-        box-shadow: 0 0 8px var(--accent);
-        animation: pulse 2s ease-in-out infinite;
-      }
+    .btn-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      border: 1px solid var(--border2); background: var(--surface2);
+      color: var(--text2); font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+    }
+    .btn-icon:hover { background: var(--surface3); border-color: var(--border3); color: var(--text); }
+    .btn-icon.spinning { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-          transform: scale(1);
-        }
-        50% {
-          opacity: 0.5;
-          transform: scale(0.8);
-        }
-      }
+    /* ── FILTER BAR ─────────────────────────────────────────── */
+    .filter-bar {
+      position: sticky; top: var(--topbar-h); z-index: 90;
+      height: var(--filter-h);
+      background: rgba(7,8,14,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 28px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
 
-      .hero-title {
-        font-size: clamp(38px, 6vw, 64px);
-        font-weight: 900;
-        line-height: 1.05;
-        letter-spacing: -0.03em;
-        margin-bottom: 16px;
-      }
+    .filter-tab {
+      height: 28px; padding: 0 14px;
+      border-radius: var(--radius-btn); border: 1px solid transparent;
+      background: transparent; color: var(--text2);
+      font: 600 11px/1 'Inter', sans-serif; letter-spacing: 0.04em;
+      text-transform: uppercase; cursor: pointer; white-space: nowrap;
+      transition: all .18s;
+    }
+    .filter-tab:hover { background: var(--surface2); color: var(--text); }
+    .filter-tab.active {
+      background: var(--surface2); border-color: var(--border2); color: var(--text);
+    }
+    .filter-divider {
+      width: 1px; height: 18px;
+      background: var(--border2); flex-shrink: 0; margin: 0 4px;
+    }
 
-      .hero-title .word-local {
-        color: var(--accent);
-        background: linear-gradient(135deg, #6366f1, #a78bfa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
+    /* ── MAIN ───────────────────────────────────────────────── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 36px 28px 80px; }
 
-      .hero-title .word-sep {
-        color: var(--dim);
-        font-weight: 300;
-        -webkit-text-fill-color: var(--dim);
-      }
+    /* ── STATUS BAR ─────────────────────────────────────────── */
+    .status-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 32px;
+      font-size: 12px; color: var(--text2); font-weight: 500;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 8px var(--accent);
+      flex-shrink: 0; animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .status-dot.green  { background: var(--green);  box-shadow: 0 0 8px var(--green); animation: none; }
+    .status-dot.yellow { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; animation: none; }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.5; transform:scale(.75); }
+    }
 
-      .hero-sub {
-        font-size: 16px;
-        color: var(--muted);
-        font-weight: 400;
-        max-width: 420px;
-        margin: 0 auto;
-        line-height: 1.6;
-      }
+    /* ── SECTION ────────────────────────────────────────────── */
+    .section-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between; margin-bottom: 18px;
+    }
+    .section-title { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+    .section-count { font-size: 12px; color: var(--muted); font-weight: 500; }
 
-      /* ── DIVIDER ── */
-      .divider {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        width: 100%;
-        max-width: 720px;
-        margin-bottom: 32px;
-      }
+    /* ── FEATURED STRIP ─────────────────────────────────────── */
+    .featured-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px; margin-bottom: 48px;
+    }
 
-      .divider-line {
-        flex: 1;
-        height: 1px;
-        background: linear-gradient(
-          to right,
-          transparent,
-          var(--border2),
-          transparent
-        );
-      }
+    .featured-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 22px;
+      display: flex; flex-direction: column; gap: 14px;
+      position: relative; overflow: hidden;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      animation: card-in .35s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .featured-card::before {
+      content: ''; position: absolute; inset: 0;
+      border-radius: var(--radius-card);
+      background: radial-gradient(ellipse at top left, var(--card-glow, transparent) 0%, transparent 60%);
+      pointer-events: none; transition: opacity .2s;
+    }
+    .featured-card:hover {
+      transform: translateY(-2px); border-color: var(--border2);
+      box-shadow: 0 16px 48px rgba(0,0,0,.55);
+    }
 
-      .divider-label {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--dim);
-      }
+    .fc-top { display: flex; align-items: flex-start; gap: 14px; }
+    .fc-icon {
+      width: 54px; height: 54px; border-radius: 15px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .fc-meta { flex: 1; min-width: 0; }
+    .fc-eyebrow {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+    }
+    .fc-name { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 2px; }
+    .fc-cat  { font-size: 11px; color: var(--text2); font-weight: 500; }
+    .fc-desc { font-size: 12px; color: var(--text2); line-height: 1.65; }
+    .fc-footer {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: auto;
+    }
 
-      /* ── APP GRID ── */
-      .app-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 18px;
-        width: 100%;
-        max-width: 720px;
-      }
+    /* ── APP GRID ───────────────────────────────────────────── */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
 
-      /* ── APP CARD ── */
-      .app-card {
-        position: relative;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 28px;
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-        transition:
-          border-color 0.2s,
-          transform 0.2s,
-          box-shadow 0.2s;
-        overflow: hidden;
-        cursor: pointer;
-      }
+    /* ── APP CARD ───────────────────────────────────────────── */
+    .app-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 18px;
+      display: flex; flex-direction: column; gap: 11px;
+      position: relative; overflow: hidden;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      animation: card-in .32s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes card-in {
+      from { opacity:0; transform:translateY(12px) scale(.97); }
+      to   { opacity:1; transform:translateY(0)    scale(1); }
+    }
+    .app-card::before {
+      content: ''; position: absolute; inset: 0;
+      border-radius: var(--radius-card);
+      background: radial-gradient(ellipse at top left, var(--card-glow, transparent) 0%, transparent 55%);
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .app-card:hover { transform: translateY(-2px); border-color: var(--border2); box-shadow: 0 12px 36px rgba(0,0,0,.5); }
+    .app-card:hover::before { opacity: 1; }
+    .app-card.is-installed { border-color: var(--green-border); }
 
-      .app-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 20px;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-      }
+    .card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 10px;
+    }
+    .app-icon {
+      width: 50px; height: 50px; border-radius: var(--radius-icon);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
 
-      .app-card:hover {
-        border-color: var(--border2);
-        transform: translateY(-3px);
-        box-shadow:
-          0 16px 48px rgba(0, 0, 0, 0.5),
-          0 0 0 1px var(--border2);
-      }
+    .badge-installed {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      border-radius: var(--radius-btn); padding: 3px 9px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--green); white-space: nowrap;
+    }
+    .badge-dot {
+      width: 5px; height: 5px; background: var(--green);
+      border-radius: 50%; box-shadow: 0 0 5px var(--green);
+    }
 
-      .app-card:hover::before {
-        opacity: 1;
-      }
+    .card-name { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+    .card-cat  { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+    .card-desc {
+      font-size: 12px; color: var(--text2); line-height: 1.65;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
 
-      /* per-card accent glow */
-      .app-card[data-color="indigo"]::before {
-        background: radial-gradient(
-          ellipse at top left,
-          rgba(99, 102, 241, 0.1) 0%,
-          transparent 60%
-        );
-      }
-      .app-card[data-color="emerald"]::before {
-        background: radial-gradient(
-          ellipse at top left,
-          rgba(16, 185, 129, 0.1) 0%,
-          transparent 60%
-        );
-      }
-      .app-card[data-color="sky"]::before {
-        background: radial-gradient(
-          ellipse at top left,
-          rgba(14, 165, 233, 0.1) 0%,
-          transparent 60%
-        );
-      }
-      .app-card[data-color="violet"]::before {
-        background: radial-gradient(
-          ellipse at top left,
-          rgba(139, 92, 246, 0.1) 0%,
-          transparent 60%
-        );
-      }
-      .app-card[data-color="amber"]::before {
-        background: radial-gradient(
-          ellipse at top left,
-          rgba(245, 158, 11, 0.1) 0%,
-          transparent 60%
-        );
-      }
-      .app-card[data-color="rose"]::before {
-        background: radial-gradient(
-          ellipse at top left,
-          rgba(244, 63, 94, 0.1) 0%,
-          transparent 60%
-        );
-      }
+    .card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: auto; padding-top: 2px;
+    }
+    .card-meta { font-size: 10px; color: var(--muted); font-weight: 500; display: flex; gap: 8px; }
 
-      /* ── CARD TOP ROW ── */
-      .card-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-      }
+    /* ── BUTTONS ────────────────────────────────────────────── */
+    .btn-open {
+      height: 30px; padding: 0 14px;
+      background: var(--green-bg); border: 1px solid var(--green-border);
+      border-radius: var(--radius-btn); color: var(--green);
+      font: 700 11px/1 'Inter',sans-serif; letter-spacing: 0.04em;
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 4px;
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-open:hover {
+      background: rgba(34,197,94,.22); border-color: rgba(34,197,94,.5);
+      box-shadow: 0 0 14px rgba(34,197,94,.2); transform: translateY(-1px);
+    }
 
-      .card-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        flex-shrink: 0;
-      }
+    .btn-get {
+      height: 30px; padding: 0 14px;
+      background: rgba(91,94,244,.1); border: 1px solid rgba(91,94,244,.3);
+      border-radius: var(--radius-btn); color: #818cf8;
+      font: 700 11px/1 'Inter',sans-serif; letter-spacing: 0.04em;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-get:hover {
+      background: rgba(91,94,244,.18); border-color: rgba(91,94,244,.5);
+      box-shadow: 0 0 14px rgba(91,94,244,.2); transform: translateY(-1px);
+    }
 
-      .card-arrow {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        border: 1px solid var(--border2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--muted);
-        font-size: 14px;
-        opacity: 0;
-        transition:
-          opacity 0.2s,
-          transform 0.2s,
-          border-color 0.2s,
-          color 0.2s;
-        flex-shrink: 0;
-      }
+    .btn-try {
+      height: 30px; padding: 0 14px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius-btn); color: var(--text2);
+      font: 700 11px/1 'Inter',sans-serif; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-try:hover { background: var(--surface3); border-color: var(--border3); color: var(--text); }
 
-      .app-card:hover .card-arrow {
-        opacity: 1;
-        transform: translate(2px, -2px);
-      }
+    /* ── SKELETON ───────────────────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -500px 0; }
+      100% { background-position:  500px 0; }
+    }
+    .skel {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 1.6s infinite;
+      border-radius: 8px;
+    }
+    .skel-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-card); padding: 18px;
+      display: flex; flex-direction: column; gap: 11px;
+    }
 
-      /* ── CARD BODY ── */
-      .card-body {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .card-title {
-        font-size: 18px;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        line-height: 1.2;
-        color: var(--text);
-      }
+    /* ── CLONE MODAL ────────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 0 16px 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
 
-      .card-desc {
-        font-size: 13px;
-        color: var(--muted);
-        line-height: 1.6;
-        font-weight: 400;
-      }
+    .clone-sheet {
+      width: 100%; max-width: 520px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 24px; padding: 26px;
+      transform: translateY(32px);
+      transition: transform .3s cubic-bezier(0.34,1.56,0.64,1);
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .overlay.open .clone-sheet { transform: translateY(0); }
 
-      /* ── PILL TAG ── */
-      .card-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        border-radius: 100px;
-        padding: 5px 14px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #fff;
-        align-self: flex-start;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        box-shadow:
-          0 3px 12px rgba(0, 0, 0, 0.35),
-          inset 0 1px 0 rgba(255, 255, 255, 0.15);
-      }
+    .sheet-head { display: flex; align-items: center; gap: 14px; }
+    .sheet-icon {
+      width: 50px; height: 50px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
+    }
+    .sheet-name { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+    .sheet-cat  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .sheet-close {
+      margin-left: auto; width: 28px; height: 28px; border-radius: 50%;
+      background: var(--surface3); border: 1px solid var(--border2);
+      color: var(--text2); font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all .18s;
+    }
+    .sheet-close:hover { background: var(--dim); color: var(--text); }
 
-      .pill-dot {
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.7);
-        flex-shrink: 0;
-      }
+    .clone-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .clone-row {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 13px 15px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .clone-cmd {
+      font: 500 12px/1.6 'SF Mono','Fira Code',monospace;
+      color: #a5b4fc; flex: 1; word-break: break-all;
+    }
+    .btn-copy {
+      height: 30px; padding: 0 13px;
+      background: var(--surface3); border: 1px solid var(--border2);
+      border-radius: 8px; color: var(--text2);
+      font: 600 11px/1 'Inter',sans-serif; cursor: pointer; white-space: nowrap;
+      display: flex; align-items: center; gap: 5px; transition: all .2s;
+    }
+    .btn-copy:hover { background: var(--dim); color: var(--text); }
+    .btn-copy.copied { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
 
-      /* color variants */
-      .pill-indigo {
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-      }
-      .pill-emerald {
-        background: linear-gradient(135deg, #10b981, #059669);
-      }
-      .pill-sky {
-        background: linear-gradient(135deg, #0ea5e9, #0284c7);
-      }
-      .pill-violet {
-        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      }
-      .pill-amber {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-      }
+    .sheet-links { display: flex; gap: 10px; }
+    .btn-gh {
+      flex: 1; height: 38px; border-radius: 12px;
+      border: 1px solid var(--border2); background: var(--surface3);
+      color: var(--text2); font: 600 12px/1 'Inter',sans-serif;
+      cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .2s;
+    }
+    .btn-gh:hover { background: var(--dim); color: var(--text); }
 
-      /* icon bg variants */
-      .icon-indigo {
-        background: rgba(99, 102, 241, 0.15);
-      }
-      .icon-emerald {
-        background: rgba(16, 185, 129, 0.15);
-      }
-      .icon-sky {
-        background: rgba(14, 165, 233, 0.15);
-      }
-      .icon-violet {
-        background: rgba(139, 92, 246, 0.15);
-      }
-      .icon-amber {
-        background: rgba(245, 158, 11, 0.15);
-      }
+    /* ── TOAST ──────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(18px);
+      background: var(--surface3); border: 1px solid var(--border2);
+      border-radius: var(--radius-btn); padding: 9px 20px;
+      font: 600 12px/1 'Inter',sans-serif; color: var(--text);
+      box-shadow: 0 8px 30px rgba(0,0,0,.5); z-index: 300;
+      opacity: 0; pointer-events: none;
+      transition: all .3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-      .app-card:hover .card-arrow.indigo {
-        border-color: #6366f1;
-        color: #818cf8;
-      }
-      .app-card:hover .card-arrow.emerald {
-        border-color: #10b981;
-        color: #34d399;
-      }
-      .app-card:hover .card-arrow.sky {
-        border-color: #0ea5e9;
-        color: #38bdf8;
-      }
-      .app-card:hover .card-arrow.violet {
-        border-color: #8b5cf6;
-        color: #a78bfa;
-      }
-      .app-card:hover .card-arrow.amber {
-        border-color: #f59e0b;
-        color: #fcd34d;
-      }
-      .app-card[data-color="rose"] .card-icon {
-        background: rgba(244, 63, 94, 0.15);
-      }
-      .pill-rose {
-        background: linear-gradient(135deg, #f43f5e, #e11d48);
-      }
-      .app-card:hover .card-arrow.rose {
-        border-color: #f43f5e;
-        color: #fb7185;
-      }
+    /* ── EMPTY STATE ────────────────────────────────────────── */
+    .empty {
+      grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-icon { font-size: 44px; margin-bottom: 14px; }
+    .empty-title { font-size: 15px; font-weight: 600; color: var(--text2); }
+    .empty-sub   { font-size: 12px; margin-top: 6px; }
 
-      /* ── FOOTER ── */
-      .footer {
-        margin-top: 72px;
-        text-align: center;
-        font-size: 12px;
-        color: var(--dim);
-        font-weight: 500;
-        letter-spacing: 0.03em;
-      }
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .topbar, .filter-bar, .main { padding-left: 16px; padding-right: 16px; }
+      .brand-sub { display: none; }
+      .apps-grid { grid-template-columns: 1fr; }
+      .featured-strip { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
 
-      .footer span {
-        color: var(--muted);
-      }
+<!-- ── TOPBAR ──────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">⚡</div>
+    <div>
+      <div class="brand-name">Mindobix</div>
+      <div class="brand-sub">App Store</div>
+    </div>
+  </div>
 
-      /* ── RESPONSIVE ── */
-      @media (max-width: 480px) {
-        .page {
-          padding: 52px 16px 52px;
-        }
-        .app-grid {
-          grid-template-columns: 1fr;
-        }
-        .hero-title {
-          font-size: 36px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="page">
-      <!-- HERO -->
-      <div class="hero">
-        <div class="hero-eyebrow">
-          <span class="hero-eyebrow-dot"></span>
-          Local Apps
-        </div>
-        <h1 class="hero-title">
-          <span class="word-local">Local</span>
-          <span class="word-sep"> &rsaquo; </span>LaunchPad
-        </h1>
-        <p class="hero-sub">
-          Your personal collection of offline-first web apps. Pick one and
-          launch.
-        </p>
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input id="search" type="search" placeholder="Search apps…" autocomplete="off" />
+  </div>
+
+  <div class="topbar-right">
+    <button class="btn-icon" id="btn-refresh" title="Refresh">↻</button>
+  </div>
+</header>
+
+<!-- ── FILTER BAR ───────────────────────────────────────────── -->
+<div class="filter-bar" id="filter-bar">
+  <button class="filter-tab active" data-filter="all">All</button>
+  <button class="filter-tab" data-filter="installed">Installed</button>
+  <button class="filter-tab" data-filter="available">Available</button>
+  <!-- category tabs injected dynamically -->
+</div>
+
+<!-- ── MAIN ─────────────────────────────────────────────────── -->
+<main class="main">
+
+  <div id="status-bar" class="status-bar" style="display:none">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text"></span>
+  </div>
+
+  <section id="featured-section" style="display:none">
+    <div class="section-header">
+      <h2 class="section-title">Featured</h2>
+    </div>
+    <div id="featured-strip" class="featured-strip"></div>
+  </section>
+
+  <section id="all-section">
+    <div class="section-header">
+      <h2 class="section-title" id="grid-title">All Apps</h2>
+      <span class="section-count" id="grid-count"></span>
+    </div>
+    <div id="apps-grid" class="apps-grid"></div>
+  </section>
+
+</main>
+
+<!-- ── CLONE SHEET ───────────────────────────────────────────── -->
+<div class="overlay" id="overlay">
+  <div class="clone-sheet">
+    <div class="sheet-head">
+      <div class="sheet-icon" id="s-icon"></div>
+      <div>
+        <div class="sheet-name" id="s-name"></div>
+        <div class="sheet-cat"  id="s-cat"></div>
       </div>
+      <button class="sheet-close" id="s-close">✕</button>
+    </div>
 
-      <!-- DIVIDER -->
-      <div class="divider">
-        <div class="divider-line"></div>
-        <div class="divider-label">Apps</div>
-        <div class="divider-line"></div>
-      </div>
-
-      <!-- APP GRID -->
-      <div class="app-grid">
-        <!-- Trading Journal -->
-        <a
-          class="app-card"
-          href="../local-trading-journal/index.html"
-          data-color="emerald"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-emerald">📈</div>
-            <div class="card-arrow emerald">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Trading Journal</div>
-            <div class="card-desc">
-              Log trades, track P&amp;L, and analyze performance — all in the
-              browser with no server required.
-            </div>
-          </div>
-          <div class="card-pill pill-emerald">
-            <span class="pill-dot"></span>Finance
-          </div>
-        </a>
-
-        <!-- VibeCoding App Ideas -->
-        <a
-          class="app-card"
-          href="../local-vibecoding-appideas/index.html"
-          data-color="violet"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-violet">💡</div>
-            <div class="card-arrow violet">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">VibeCoding Ideas</div>
-            <div class="card-desc">
-              Capture, organize, and develop app ideas by category with a
-              Notion-style editor, GitHub links, status tracking, and versions.
-            </div>
-          </div>
-          <div class="card-pill pill-violet">
-            <span class="pill-dot"></span>Productivity
-          </div>
-        </a>
-
-        <!-- MyCareerPulse -->
-        <a
-          class="app-card"
-          href="../MyCareerPulse/index.html"
-          data-color="violet"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-violet">🧠</div>
-            <div class="card-arrow violet">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">MyCareerPulse</div>
-            <div class="card-desc">
-              Local AI career intelligence — scores jobs against your skills,
-              tailors resumes, and builds your career twin. No cloud, no fees.
-            </div>
-          </div>
-          <div class="card-pill pill-violet">
-            <span class="pill-dot"></span>AI · Career
-          </div>
-        </a>
-
-        <!-- LocalApiWebProxy -->
-        <a
-          class="app-card"
-          href="../local-api-web-proxy/index.html"
-          data-color="violet"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-violet">🔭</div>
-            <div class="card-arrow violet">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">LocalApiWebProxy</div>
-            <div class="card-desc">
-              HTTP/HTTPS proxy with a real-time dashboard — inspect, debug, and
-              export API traffic from any device on your network.
-            </div>
-          </div>
-          <div class="card-pill pill-violet">
-            <span class="pill-dot"></span>Dev Tools
-          </div>
-        </a>
-
-        <!-- ShareAnyJSON -->
-        <a
-          class="app-card"
-          href="../local-shareanyjson/index.html"
-          data-color="sky"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-sky">🗂️</div>
-            <div class="card-arrow sky">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">ShareAnyJSON</div>
-            <div class="card-desc">
-              Create, edit, version, and promote JSON config files across
-              environments — no server, no login, all stored locally.
-            </div>
-          </div>
-          <div class="card-pill pill-sky">
-            <span class="pill-dot"></span>Dev Tools
-          </div>
-        </a>
-
-        <!-- FileSync -->
-        <a
-          class="app-card"
-          href="../local-filesync/index.html"
-          data-color="emerald"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-emerald">🔄</div>
-            <div class="card-arrow emerald">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Desktops FileSync</div>
-            <div class="card-desc">
-              Cross-platform LAN file sync — peer discovery, WebSocket transfer,
-              and a React UI. Sync files across devices with no cloud required.
-            </div>
-          </div>
-          <div class="card-pill pill-emerald">
-            <span class="pill-dot"></span>Dev Tools
-          </div>
-        </a>
-
-        <!-- Keywords Files Finder -->
-        <a
-          class="app-card"
-          href="../local-keywords-files-finder/index.html"
-          data-color="sky"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-sky">🔍</div>
-            <div class="card-arrow sky">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Keywords Files Finder</div>
-            <div class="card-desc">
-              Search your local files by keyword — scan folders, filter by file
-              type, and locate matches fast with no server required.
-            </div>
-          </div>
-          <div class="card-pill pill-sky">
-            <span class="pill-dot"></span>Search
-          </div>
-        </a>
-
-        <!-- Recipe Book -->
-        <a
-          class="app-card"
-          href="../local-recipebook/index.html"
-          data-color="amber"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-amber">🍳</div>
-            <div class="card-arrow amber">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Recipe Book</div>
-            <div class="card-desc">
-              Store and organize your recipes by category — ingredients,
-              instructions, and notes — all saved locally in your browser.
-            </div>
-          </div>
-          <div class="card-pill pill-amber">
-            <span class="pill-dot"></span>Recipes
-          </div>
-        </a>
-
-        <!-- My Family Tree -->
-        <a
-          class="app-card"
-          href="../myfamilytree/index.html"
-          data-color="emerald"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-emerald">🌳</div>
-            <div class="card-arrow emerald">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">My Family Tree</div>
-            <div class="card-desc">
-              Build and visualize your family tree — add members, relationships,
-              and notes — all stored locally in your browser.
-            </div>
-          </div>
-          <div class="card-pill pill-emerald">
-            <span class="pill-dot"></span>Family
-          </div>
-        </a>
-        <!-- Monthly BillPay -->
-        <a
-          class="app-card"
-          href="../local-billpay-tracker/index.html"
-          data-color="rose"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon" style="background: rgba(244, 63, 94, 0.15)">
-              💸
-            </div>
-            <div class="card-arrow rose">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Monthly BillPay</div>
-            <div class="card-desc">
-              Track monthly bills on a calendar, manage subscriptions, and
-              filter by category &amp; payment method — all stored locally.
-            </div>
-          </div>
-          <div class="card-pill pill-rose">
-            <span class="pill-dot"></span>Finance
-          </div>
-        </a>
-
-        <!-- Weekly Options Trade Plan -->
-
-        <a
-          class="app-card"
-          href="../local-weekly-options-trade-plan/index.html"
-          data-color="violet"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-violet">📋</div>
-            <div class="card-arrow violet">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Weekly Options Trade Plan</div>
-            <div class="card-desc">
-              Track options trade plans by week — strike, expiry, trigger,
-              targets, and stop — with monthly, weekly, and daily card views.
-            </div>
-          </div>
-          <div class="card-pill pill-violet">
-            <span class="pill-dot"></span>Options
-          </div>
-        </a>
-        <!-- Habit Calendar -->
-        <a
-          class="app-card"
-          href="../local-habit-calendar/index.html"
-          data-color="indigo"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-indigo">📅</div>
-            <div class="card-arrow indigo">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">Habit Calendar</div>
-            <div class="card-desc">
-              Track daily habits on a visual calendar. Log streaks, mark
-              completions, and review your progress month by month.
-            </div>
-          </div>
-          <div class="card-pill pill-indigo">
-            <span class="pill-dot"></span>Habit Tracker
-          </div>
-        </a>
-        <!-- MedReview -->
-        <a
-          class="app-card"
-          href="../medreview/index.html"
-          data-color="sky"
-          target="_blank"
-          rel="noopener"
-        >
-          <div class="card-top">
-            <div class="card-icon icon-sky">🩺</div>
-            <div class="card-arrow sky">&#8599;</div>
-          </div>
-          <div class="card-body">
-            <div class="card-title">MedReview</div>
-            <div class="card-desc">
-              USMLE Step prep flashcards and review — study by system, topic,
-              and step level with progress tracked locally.
-            </div>
-          </div>
-          <div class="card-pill pill-sky">
-            <span class="pill-dot"></span>Medical
-          </div>
-        </a>
-      </div>
-
-      <!-- FOOTER -->
-      <div class="footer">
-        Built locally &mdash; <span>no internet required</span>
+    <div>
+      <div class="clone-label">Clone command</div>
+      <div class="clone-row">
+        <div class="clone-cmd" id="s-cmd"></div>
+        <button class="btn-copy" id="btn-copy">📋 Copy</button>
       </div>
     </div>
-  </body>
+
+    <div class="sheet-links">
+      <a class="btn-gh" id="s-gh" href="#" target="_blank" rel="noopener">🐙 View on GitHub</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ─────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────────────────────
+const GITHUB_USER = 'mindobix';
+const API_URL     = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated&type=public`;
+const SELF        = 'local-web-apps';
+
+// Repos to hide from the store (non-launchable / meta)
+const EXCLUDED = new Set(['mindobix-website']);
+
+// Rich metadata for known repos
+const META = {
+  'local-trading-journal':           { icon:'📈', color:'#10b981', bg:'rgba(16,185,129,.15)',  cat:'Finance',      featured:true  },
+  'local-vibecoding-appideas':       { icon:'💡', color:'#8b5cf6', bg:'rgba(139,92,246,.15)',  cat:'Productivity', featured:true  },
+  'MyCareerPulse':                   { icon:'🧠', color:'#8b5cf6', bg:'rgba(139,92,246,.15)',  cat:'AI · Career',  featured:true  },
+  'local-my-pwds-keys':              { icon:'🔐', color:'#6366f1', bg:'rgba(99,102,241,.15)',  cat:'Security',     featured:true  },
+  'medreview':                       { icon:'🩺', color:'#0ea5e9', bg:'rgba(14,165,233,.15)',  cat:'Medical',      featured:true  },
+  'local-api-web-proxy':             { icon:'🔭', color:'#6366f1', bg:'rgba(99,102,241,.15)',  cat:'Dev Tools',    featured:false },
+  'local-shareanyjson':              { icon:'🗂️', color:'#0ea5e9', bg:'rgba(14,165,233,.15)', cat:'Dev Tools',    featured:false },
+  'local-filesync':                  { icon:'🔄', color:'#10b981', bg:'rgba(16,185,129,.15)',  cat:'Dev Tools',    featured:false },
+  'local-keywords-files-finder':     { icon:'🔍', color:'#0ea5e9', bg:'rgba(14,165,233,.15)',  cat:'Search',       featured:false },
+  'local-recipebook':                { icon:'🍳', color:'#f59e0b', bg:'rgba(245,158,11,.15)',  cat:'Lifestyle',    featured:false },
+  'myfamilytree':                    { icon:'🌳', color:'#10b981', bg:'rgba(16,185,129,.15)',  cat:'Family',       featured:false },
+  'local-billpay-tracker':           { icon:'💸', color:'#f43f5e', bg:'rgba(244,63,94,.15)',   cat:'Finance',      featured:false },
+  'local-weekly-options-trade-plan': { icon:'📋', color:'#8b5cf6', bg:'rgba(139,92,246,.15)',  cat:'Finance',      featured:false },
+  'local-habit-calendar':            { icon:'📅', color:'#6366f1', bg:'rgba(99,102,241,.15)',  cat:'Productivity', featured:false },
+  'local-dailywealth':               { icon:'💰', color:'#f59e0b', bg:'rgba(245,158,11,.15)',  cat:'Finance',      featured:false },
+};
+
+const DISPLAY_NAMES = {
+  'local-trading-journal':           'Trading Journal',
+  'local-vibecoding-appideas':       'VibeCoding Ideas',
+  'MyCareerPulse':                   'MyCareerPulse',
+  'local-api-web-proxy':             'LocalApiWebProxy',
+  'local-shareanyjson':              'ShareAnyJSON',
+  'local-filesync':                  'Desktops FileSync',
+  'local-keywords-files-finder':     'Keywords Files Finder',
+  'local-recipebook':                'Recipe Book',
+  'myfamilytree':                    'My Family Tree',
+  'local-billpay-tracker':           'Monthly BillPay',
+  'local-weekly-options-trade-plan': 'Weekly Options Trade Plan',
+  'local-habit-calendar':            'Habit Calendar',
+  'medreview':                       'MedReview',
+  'local-my-pwds-keys':              'My Passwords & Keys',
+  'local-dailywealth':               'Daily Wealth',
+};
+
+// ─────────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────────
+let allRepos     = []; // [{ repo, status }]
+let activeFilter = 'all';
+let searchQuery  = '';
+
+// ─────────────────────────────────────────────────────────────
+//  GITHUB API
+// ─────────────────────────────────────────────────────────────
+async function fetchRepos() {
+  const res = await fetch(API_URL, {
+    headers: { Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!res.ok) {
+    const left = res.headers.get('X-RateLimit-Remaining');
+    if (left === '0') throw new Error('GitHub API rate limit hit — try again in an hour.');
+    throw new Error(`GitHub returned ${res.status}`);
+  }
+  const repos = await res.json();
+  return repos.filter(r => !r.fork && !r.archived && !EXCLUDED.has(r.name) && r.name !== SELF);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  CLONE DETECTION  (HEAD fetch to sibling directory)
+// ─────────────────────────────────────────────────────────────
+async function detectStatus(repoName) {
+  try {
+    const res = await fetch(`../${repoName}/index.html`, { method:'HEAD', cache:'no-store' });
+    return res.ok ? 'installed' : 'not-installed';
+  } catch {
+    return 'unknown'; // file:// limitation or network error
+  }
+}
+
+async function detectAll(repos) {
+  const results = await Promise.allSettled(
+    repos.map(r => detectStatus(r.name).then(s => [r.name, s]))
+  );
+  return Object.fromEntries(
+    results.filter(r => r.status === 'fulfilled').map(r => r.value)
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────────────────────
+function getMeta(name) {
+  return META[name] || { icon:'📦', color:'#6b7090', bg:'rgba(107,112,144,.15)', cat:'App', featured:false };
+}
+
+function getDisplayName(name) {
+  if (DISPLAY_NAMES[name]) return DISPLAY_NAMES[name];
+  return name.replace(/^local-/,'').replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function timeAgo(iso) {
+  const s = (Date.now() - new Date(iso)) / 1000;
+  if (s < 3600)    return `${Math.floor(s/60)}m ago`;
+  if (s < 86400)   return `${Math.floor(s/3600)}h ago`;
+  if (s < 2592000) return `${Math.floor(s/86400)}d ago`;
+  return `${Math.floor(s/2592000)}mo ago`;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ACTION BUTTON HTML
+// ─────────────────────────────────────────────────────────────
+function actionBtn(repo, status) {
+  if (status === 'installed')
+    return `<a class="btn-open" href="../${repo.name}/index.html" target="_blank" rel="noopener">Open ↗</a>`;
+  if (status === 'not-installed')
+    return `<button class="btn-get" data-repo="${repo.name}">Get ↓</button>`;
+  return `<a class="btn-try" href="../${repo.name}/index.html" target="_blank" rel="noopener">Try ↗</a>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  SKELETON CARDS
+// ─────────────────────────────────────────────────────────────
+function skeletonCards(n) {
+  return Array.from({length:n}, () => `
+    <div class="skel-card">
+      <div class="skel" style="width:50px;height:50px;border-radius:14px"></div>
+      <div class="skel" style="height:13px;width:65%"></div>
+      <div class="skel" style="height:11px;width:35%"></div>
+      <div class="skel" style="height:38px"></div>
+      <div class="skel" style="height:30px;width:72px;border-radius:100px;margin-left:auto"></div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RENDER APP CARD
+// ─────────────────────────────────────────────────────────────
+function renderCard(repo, status, delay=0) {
+  const m = getMeta(repo.name);
+  const badge = status === 'installed'
+    ? `<div class="badge-installed"><span class="badge-dot"></span>Installed</div>` : '';
+  const stars = repo.stargazers_count > 0 ? `★ ${repo.stargazers_count}` : '';
+  return `
+    <div class="app-card ${status==='installed'?'is-installed':''}"
+         style="--card-glow:${m.bg.replace('.15','.07')};animation-delay:${delay}ms"
+         data-repo="${repo.name}" data-status="${status}" data-cat="${m.cat}"
+         data-search="${repo.name.toLowerCase()} ${getDisplayName(repo.name).toLowerCase()} ${(repo.description||'').toLowerCase()} ${m.cat.toLowerCase()}">
+      <div class="card-top">
+        <div class="app-icon" style="background:${m.bg}">${m.icon}</div>
+        ${badge}
+      </div>
+      <div>
+        <div class="card-name">${getDisplayName(repo.name)}</div>
+        <div class="card-cat">${m.cat}</div>
+      </div>
+      <div class="card-desc">${repo.description || 'A local web app from Mindobix.'}</div>
+      <div class="card-footer">
+        <div class="card-meta">
+          ${stars ? `<span>${stars}</span>` : ''}
+          <span>${timeAgo(repo.updated_at)}</span>
+        </div>
+        ${actionBtn(repo, status)}
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RENDER FEATURED CARD
+// ─────────────────────────────────────────────────────────────
+function renderFeatured(repo, status) {
+  const m = getMeta(repo.name);
+  const stars = repo.stargazers_count > 0 ? `★ ${repo.stargazers_count} · ` : '';
+  return `
+    <div class="featured-card" style="--card-glow:${m.bg.replace('.15','.1')}">
+      <div class="fc-top">
+        <div class="fc-icon" style="background:${m.bg}">${m.icon}</div>
+        <div class="fc-meta">
+          <div class="fc-eyebrow">Featured</div>
+          <div class="fc-name">${getDisplayName(repo.name)}</div>
+          <div class="fc-cat">${m.cat}</div>
+        </div>
+      </div>
+      <div class="fc-desc">${repo.description || 'A local web app from Mindobix.'}</div>
+      <div class="fc-footer">
+        <div class="card-meta">${stars}${timeAgo(repo.updated_at)}</div>
+        ${actionBtn(repo, status)}
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  FILTER & RENDER
+// ─────────────────────────────────────────────────────────────
+function getFiltered() {
+  return allRepos.filter(({ repo, status }) => {
+    const m = getMeta(repo.name);
+    if (activeFilter === 'installed'    && status !== 'installed')     return false;
+    if (activeFilter === 'available'    && status === 'installed')     return false;
+    if (activeFilter !== 'all' && activeFilter !== 'installed' && activeFilter !== 'available') {
+      if (m.cat !== activeFilter) return false;
+    }
+    if (searchQuery) {
+      const el = document.querySelector(`[data-repo="${repo.name}"]`);
+      const haystack = el ? el.dataset.search
+        : `${repo.name} ${getDisplayName(repo.name)} ${repo.description||''} ${m.cat}`.toLowerCase();
+      if (!haystack.includes(searchQuery.toLowerCase())) return false;
+    }
+    return true;
+  });
+}
+
+function renderAll() {
+  const filtered    = getFiltered();
+  const showFeatured = activeFilter === 'all' && !searchQuery;
+  const featuredSet  = new Set(allRepos.filter(r => getMeta(r.repo.name).featured).map(r => r.repo.name));
+
+  // Featured strip
+  const featuredSec = document.getElementById('featured-section');
+  if (showFeatured) {
+    const featuredItems = allRepos.filter(r => featuredSet.has(r.repo.name));
+    document.getElementById('featured-strip').innerHTML =
+      featuredItems.slice(0,3).map(({ repo, status }) => renderFeatured(repo, status)).join('');
+    featuredSec.style.display = '';
+  } else {
+    featuredSec.style.display = 'none';
+  }
+
+  // Grid title
+  const titleMap = { all:'All Apps', installed:'Installed', available:'Available' };
+  document.getElementById('grid-title').textContent = titleMap[activeFilter] || `${activeFilter} Apps`;
+
+  // Grid items — when showing "all", exclude featured from grid so they don't duplicate
+  const gridItems = showFeatured
+    ? filtered.filter(({ repo }) => !featuredSet.has(repo.name))
+    : filtered;
+
+  document.getElementById('grid-count').textContent =
+    `${filtered.length} app${filtered.length !== 1 ? 's' : ''}`;
+
+  const grid = document.getElementById('apps-grid');
+  if (gridItems.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div>
+      <div class="empty-title">No apps found</div>
+      <div class="empty-sub">Try a different filter or search term</div></div>`;
+  } else {
+    grid.innerHTML = gridItems.map(({ repo, status }, i) => renderCard(repo, status, i * 28)).join('');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  CATEGORY TABS
+// ─────────────────────────────────────────────────────────────
+function buildCategoryTabs(repos) {
+  const bar  = document.getElementById('filter-bar');
+  // remove old dynamic tabs
+  bar.querySelectorAll('.filter-divider, [data-filter]:not([data-filter="all"]):not([data-filter="installed"]):not([data-filter="available"])')
+     .forEach(el => el.remove());
+
+  const cats = [...new Set(repos.map(r => getMeta(r.name).cat))].sort();
+  const div  = document.createElement('div');
+  div.className = 'filter-divider';
+  bar.appendChild(div);
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className   = 'filter-tab';
+    btn.dataset.filter = cat;
+    btn.textContent = cat;
+    btn.addEventListener('click', () => setFilter(cat));
+    bar.appendChild(btn);
+  });
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.filter === f));
+  renderAll();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  STATUS BAR
+// ─────────────────────────────────────────────────────────────
+function setStatus(msg, type='') {
+  document.getElementById('status-bar').style.display = 'flex';
+  document.getElementById('status-dot').className  = `status-dot ${type}`;
+  document.getElementById('status-text').textContent = msg;
+}
+function hideStatus() { document.getElementById('status-bar').style.display = 'none'; }
+
+// ─────────────────────────────────────────────────────────────
+//  CLONE SHEET
+// ─────────────────────────────────────────────────────────────
+function openSheet(repo) {
+  const m   = getMeta(repo.name);
+  const cmd = `git clone https://github.com/${GITHUB_USER}/${repo.name}.git`;
+
+  const icon = document.getElementById('s-icon');
+  icon.style.background = m.bg;
+  icon.textContent = m.icon;
+  document.getElementById('s-name').textContent = getDisplayName(repo.name);
+  document.getElementById('s-cat').textContent  = m.cat;
+  document.getElementById('s-cmd').textContent  = cmd;
+  document.getElementById('s-gh').href          = repo.html_url;
+
+  const copyBtn = document.getElementById('btn-copy');
+  copyBtn.textContent = '📋 Copy';
+  copyBtn.className   = 'btn-copy';
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(cmd).then(() => {
+      copyBtn.textContent = '✓ Copied!';
+      copyBtn.className   = 'btn-copy copied';
+      showToast('Clone command copied to clipboard');
+      setTimeout(() => { copyBtn.textContent = '📋 Copy'; copyBtn.className = 'btn-copy'; }, 2200);
+    });
+  };
+
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSheet() { document.getElementById('overlay').classList.remove('open'); }
+
+// ─────────────────────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────────
+async function init() {
+  document.getElementById('apps-grid').innerHTML      = skeletonCards(9);
+  document.getElementById('featured-strip').innerHTML = skeletonCards(3);
+  document.getElementById('featured-section').style.display = '';
+  setStatus('Fetching repos from GitHub…');
+
+  let repos;
+  try {
+    repos = await fetchRepos();
+  } catch (err) {
+    document.getElementById('apps-grid').innerHTML =
+      `<div class="empty"><div class="empty-icon">⚠️</div>
+       <div class="empty-title">Could not load repos</div>
+       <div class="empty-sub">${err.message}</div></div>`;
+    document.getElementById('featured-section').style.display = 'none';
+    setStatus(err.message, 'yellow');
+    return;
+  }
+
+  setStatus('Checking which apps are cloned locally…');
+  const statusMap = await detectAll(repos);
+
+  allRepos = repos.map(repo => ({ repo, status: statusMap[repo.name] || 'unknown' }));
+
+  const installed = allRepos.filter(r => r.status === 'installed').length;
+  const total     = allRepos.length;
+
+  if (window.location.protocol === 'file:') {
+    setStatus(
+      `Running via file:// — clone detection limited. Serve with a local server for full detection.`,
+      'yellow'
+    );
+  } else {
+    setStatus(`${installed} of ${total} apps installed locally`, 'green');
+    setTimeout(hideStatus, 4000);
+  }
+
+  buildCategoryTabs(repos);
+  renderAll();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  EVENT DELEGATION
+// ─────────────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const getBtn = e.target.closest('.btn-get');
+  if (getBtn) {
+    const r = allRepos.find(r => r.repo.name === getBtn.dataset.repo);
+    if (r) openSheet(r.repo);
+  }
+});
+
+document.getElementById('btn-refresh').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('spinning');
+  allRepos = [];
+  await init();
+  btn.classList.remove('spinning');
+  showToast('Refreshed ✓');
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderAll();
+});
+
+document.querySelectorAll('.filter-tab').forEach(t =>
+  t.addEventListener('click', () => setFilter(t.dataset.filter)));
+
+document.getElementById('s-close').addEventListener('click', closeSheet);
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeSheet();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+// ── Go ──
+init();
+</script>
+</body>
 </html>

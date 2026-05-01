@@ -82,11 +82,16 @@ Plan and track weekly options trades across monthly, weekly, and daily views. Lo
 
 ---
 
-## LaunchPad
+## LaunchPad (App Store)
 
-Open `index.html` in your browser to access all apps from a single page.
+Open `index.html` in a local server to get the full App Store experience:
 
-> **Important — directory layout:** The LaunchPad links to each app using relative paths that go up one level (`../app-name/index.html`). For these links to work, **all repos must be cloned as siblings inside the same parent folder**, like this:
+- Fetches all public repos from the **mindobix** GitHub org automatically
+- Detects which ones are **already cloned** (green "Open" button) vs not yet cloned (indigo "Get" button with a one-click copy of the `git clone` command)
+- **Search** and filter by All · Installed · Available · category
+- Refreshes on demand without a page reload
+
+> **Important — directory layout:** All repos must be cloned as siblings inside the same parent folder, like this:
 >
 > ```
 > vibecode/                          ← any parent folder name works
@@ -107,4 +112,4 @@ Open `index.html` in your browser to access all apps from a single page.
 > └── medreview/
 > ```
 >
-> If a repo is cloned into a different location, its card in the LaunchPad will open a broken page. Clone each app repo next to `local-web-apps/` and the links will work without any changes.
+> Clone detection works via relative `HEAD` requests to `../repo-name/index.html`. This requires serving the file over HTTP (not `file://`). Run `python3 -m http.server 8080` inside the parent folder and open `http://localhost:8080/local-web-apps/`. On `file://` the store still shows all GitHub repos but can't auto-detect which are cloned.
