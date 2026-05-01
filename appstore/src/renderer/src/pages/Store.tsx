@@ -12,7 +12,7 @@ interface Props {
   onChangeFolder: () => void
 }
 
-type Filter = 'all' | 'installed' | 'available' | string
+type Filter = 'all' | 'installed' | 'available' | 'favorites' | string
 
 interface CloneState {
   appId: string
@@ -25,6 +25,9 @@ export default function Store({ settings, onChangeFolder }: Props) {
   const [statuses, setStatuses] = useState<Record<string, boolean>>({})
   const [servers, setServers] = useState<Record<string, number>>({})
   const [filter, setFilter] = useState<Filter>('all')
+  const [favorites, setFavorites] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('favorites') ?? '[]')) } catch { return new Set() }
+  })
   const [search, setSearch] = useState('')
   const [cloneState, setCloneState] = useState<CloneState | null>(null)
   const [cloningIds, setCloningIds] = useState<Set<string>>(new Set())
@@ -110,13 +113,23 @@ export default function Store({ settings, onChangeFolder }: Props) {
     showToast('Refreshed ✓')
   }
 
+  const toggleFavorite = (appId: string) => {
+    setFavorites(prev => {
+      const next = new Set(prev)
+      next.has(appId) ? next.delete(appId) : next.add(appId)
+      localStorage.setItem('favorites', JSON.stringify([...next]))
+      return next
+    })
+  }
+
   const categories = [...new Set(APPS.map(a => a.category))].sort()
   const installedCount = Object.values(statuses).filter(Boolean).length
 
   const filtered = APPS.filter(app => {
     if (filter === 'installed' && !statuses[app.id]) return false
     if (filter === 'available' && statuses[app.id]) return false
-    if (filter !== 'all' && filter !== 'installed' && filter !== 'available' && app.category !== filter) return false
+    if (filter === 'favorites' && !favorites.has(app.id)) return false
+    if (filter !== 'all' && filter !== 'installed' && filter !== 'available' && filter !== 'favorites' && app.category !== filter) return false
     if (search) {
       const q = search.toLowerCase()
       if (!`${app.id} ${app.displayName} ${app.description} ${app.category}`.toLowerCase().includes(q)) return false
@@ -179,6 +192,12 @@ export default function Store({ settings, onChangeFolder }: Props) {
             {f}
           </button>
         ))}
+        <button
+          onClick={() => setFilter('favorites')}
+          className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors flex-shrink-0 flex items-center gap-1 ${filter === 'favorites' ? 'bg-[#f472b6]/20 text-[#f472b6] border border-[#f472b6]/30' : 'text-[#64748b] hover:text-white hover:bg-white/[0.08]'}`}
+        >
+          <span>♥</span> Favorites {favorites.size > 0 && <span className={`ml-0.5 ${filter === 'favorites' ? 'text-[#f472b6]' : 'text-[#4a5568]'}`}>({favorites.size})</span>}
+        </button>
         <div className="w-px h-4 bg-white/10 mx-1 flex-shrink-0" />
         {categories.map(cat => (
           <button
@@ -205,11 +224,13 @@ export default function Store({ settings, onChangeFolder }: Props) {
                   installed={!!statuses[app.id]}
                   serverPort={servers[app.id]}
                   cloning={cloningIds.has(app.id)}
+                  isFavorite={favorites.has(app.id)}
                   onClone={() => handleClone(app)}
                   onLaunch={() => handleLaunch(app)}
                   onStartServer={() => handleStartServer(app)}
                   onStopServer={() => handleStopServer(app)}
                   onOpenRepo={() => window.api.openRepo(app.repo)}
+                  onToggleFavorite={() => toggleFavorite(app.id)}
                 />
               ))}
             </div>
@@ -220,16 +241,16 @@ export default function Store({ settings, onChangeFolder }: Props) {
         <section>
           <div className="flex items-center justify-between mb-3">
             <div className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">
-              {filter === 'all' ? 'All Apps' : filter === 'installed' ? 'Installed' : filter === 'available' ? 'Available' : `${filter} Apps`}
+              {filter === 'all' ? 'All Apps' : filter === 'installed' ? 'Installed' : filter === 'available' ? 'Available' : filter === 'favorites' ? 'Favorites' : `${filter} Apps`}
             </div>
             <div className="text-xs text-[#4a5568]">{totalVisible} app{totalVisible !== 1 ? 's' : ''}</div>
           </div>
 
           {gridApps.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="text-4xl mb-3">🔍</div>
-              <div className="font-semibold text-white">No apps found</div>
-              <div className="text-[#64748b] text-sm mt-1">Try a different filter or search term</div>
+              <div className="text-4xl mb-3">{filter === 'favorites' ? '♥' : '🔍'}</div>
+              <div className="font-semibold text-white">{filter === 'favorites' ? 'No favorites yet' : 'No apps found'}</div>
+              <div className="text-[#64748b] text-sm mt-1">{filter === 'favorites' ? 'Click the heart icon on any app card to save it here' : 'Try a different filter or search term'}</div>
             </div>
           ) : (
             <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
@@ -240,11 +261,13 @@ export default function Store({ settings, onChangeFolder }: Props) {
                   installed={!!statuses[app.id]}
                   serverPort={servers[app.id]}
                   cloning={cloningIds.has(app.id)}
+                  isFavorite={favorites.has(app.id)}
                   onClone={() => handleClone(app)}
                   onLaunch={() => handleLaunch(app)}
                   onStartServer={() => handleStartServer(app)}
                   onStopServer={() => handleStopServer(app)}
                   onOpenRepo={() => window.api.openRepo(app.repo)}
+                  onToggleFavorite={() => toggleFavorite(app.id)}
                 />
               ))}
             </div>

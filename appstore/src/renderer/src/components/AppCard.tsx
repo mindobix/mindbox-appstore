@@ -5,11 +5,13 @@ interface Props {
   app: AppDef
   installed: boolean
   serverPort?: number
+  isFavorite: boolean
   onClone: () => void
   onLaunch: () => void
   onStartServer: () => void
   onStopServer: () => void
   onOpenRepo: () => void
+  onToggleFavorite: () => void
   cloning?: boolean
 }
 
@@ -31,7 +33,15 @@ function ExternalLinkIcon() {
   )
 }
 
-export default function AppCard({ app, installed, serverPort, onClone, onLaunch, onStartServer, onStopServer, onOpenRepo, cloning }: Props) {
+function HeartIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" fill={filled ? '#f472b6' : 'none'} stroke={filled ? '#f472b6' : 'currentColor'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 13.5S1.5 9.5 1.5 5.5A3.5 3.5 0 0 1 8 3.664 3.5 3.5 0 0 1 14.5 5.5C14.5 9.5 8 13.5 8 13.5z" />
+    </svg>
+  )
+}
+
+export default function AppCard({ app, installed, serverPort, isFavorite, onClone, onLaunch, onStartServer, onStopServer, onOpenRepo, onToggleFavorite, cloning }: Props) {
   const isServer = app.startType === 'python' || app.startType === 'npm'
   const serverRunning = serverPort !== undefined
 
@@ -64,6 +74,16 @@ export default function AppCard({ app, installed, serverPort, onClone, onLaunch,
               </div>
             )}
           </div>
+
+          {/* Favorite */}
+          <button
+            onClick={onToggleFavorite}
+            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors hover:bg-white/10"
+            style={{ color: isFavorite ? '#f472b6' : '#4a5568' }}
+          >
+            <HeartIcon filled={isFavorite} />
+          </button>
 
           {/* GitHub link */}
           <button
